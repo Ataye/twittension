@@ -67,7 +67,7 @@
                 .on('mouseover', function(d){ d3.select(this).attr('stroke', '#dbf5ff'); })
                 .on('mouseout', function(d){ d3.select(this).attr('stroke', 'none'); })
                 .on('click', function(d){
-                    $.jGrowl(d.name);
+                    //$.jGrowl(d.name);
                     console.log(d.name);
                 })
             ;
