@@ -25,22 +25,22 @@ io.sockets.on('connection', function(socket){
 });
 
 // twitter:
-//var tw = new twitter(twitcreds).stream('statuses/sample'
-//    , function(stream){
-//        stream.on('data', function(tweet){
-//            iTwitCount++;
-//
-//            //console.log(tweet.text);
-//            //console.log(tweet.text.length);
-//            //console.log(iTwitCount);
-//            //console.log('=============================================');
-//
-//            // send to all clients:
-//            io.sockets.emit('data', {len:tweet.text.length});
-//        })
-//});
+var tw = new twitter(twitcreds).stream('statuses/sample'
+    , function(stream){
+        stream.on('data', function(tweet){
+            //iTwitCount++;
+
+            //console.log(tweet.text);
+            //console.log(tweet.text.length);
+            //console.log(iTwitCount);
+            //console.log('=============================================');
+
+            // send to all clients:
+            io.sockets.emit('data', {len:tweet.text.length});
+        })
+});
 
 // TEST:
-setInterval(function(){
-    io.sockets.emit('data', {len:Math.floor((Math.random()*140)+1)});
-}, 1);
+//setInterval(function(){
+//    io.sockets.emit('data', {len:Math.floor((Math.random()*140)+1)});
+//}, 1);
