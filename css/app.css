@@ -1,0 +1,38 @@
+BODY, HTML {
+    background: #7a96a1;
+    margin: 0;
+    padding: 0;
+    font: 10pt Tahoma, sans-serif;
+}
+SVG {
+    margin-top: 0;
+}
+H1{
+    display:inline-block;
+    padding:0;
+    margin:0 20px;
+    font-weight:normal;
+}
+
+#dvHead{
+    display:block;
+    width: 800px;
+    height: 50px;
+    top: 0;
+    margin-left: auto;
+    margin-right: auto;
+    background: #000;
+    color: #dbf5ff;
+    padding: 2px 10px;
+    border-radius: 0 0 10px 10px; -webkit-border-radius: 0 0 10px 10px; -moz-border-radius: 0 0 10px 10px;
+    vertical-align: middle;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
+    opacity: 0.4;
+    -moz-opacity: 0.4;
+    -khtml-opacity: 0.4;
+}
+#dvCount { float:right; }
+.floatR { float:right; }
+.floatL { float:left; }
