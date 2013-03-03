@@ -4,27 +4,30 @@ BODY, HTML {
     padding: 0;
     font: 10pt Tahoma, sans-serif;
 }
-SVG {
+svg {
     margin-top: 0;
 }
-H1{
+h1{
     display:inline-block;
     padding:0;
     margin:0 20px;
     font-weight:normal;
+    line-height:50px;
 }
 
 #dvHead{
     display:block;
     width: 800px;
-    height: 50px;
+    height: 52px;
     top: 0;
     margin-left: auto;
     margin-right: auto;
     background: #000;
     color: #dbf5ff;
     padding: 2px 10px;
-    border-radius: 0 0 10px 10px; -webkit-border-radius: 0 0 10px 10px; -moz-border-radius: 0 0 10px 10px;
+    border-radius: 0 0 10px 10px;
+    -webkit-border-radius: 0 0 10px 10px;
+    -moz-border-radius: 0 0 10px 10px;
     vertical-align: middle;
 
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
@@ -36,3 +39,43 @@ H1{
 #dvCount { float:right; }
 .floatR { float:right; }
 .floatL { float:left; }
+
+/* hide items until angular has loaded command initialised */
+.ng-cloak { display:none;}
+
+/* pop panel */
+div.jGrowl.top-right { padding-top:55px; }
+div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
+    opacity: 0.4;
+    -moz-opacity: 0.4;
+    -khtml-opacity: 0.4;
+}
+#pop-panel {  }
+#pop-panel label {
+    display:inline-block;
+    width:80px;
+    color: #AEBDCC;
+    font-style: italic;
+    margin-right: 10px;
+    text-align: right;
+}
+#pop-panel span { font-size: 1.4em; }
+
+.rank {
+    float:right;
+    margin-right: 20px;
+    padding: 0;
+}
+.rank h1 {
+    float:right;
+    margin: 0;
+    height:auto;
+    line-height: 1em;
+}
+#pop-panel .rank label {
+    width:auto;
+    display: block;
+    text-align: right;
+}
