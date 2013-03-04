@@ -25,9 +25,10 @@ io.sockets.on('connection', function(socket){
 });
 
 // twitter:
-var bUseTwitter = process.env.USE_TWITTER != undefined && process.env.USE_TWITTER === '1';
+var bUseTwitter = process.env.NODE_ENV === 'production';
 console.log('Using Twitter Stream: ' + bUseTwitter);
 if (bUseTwitter){
+
     // get data from twitter:
     var tw = new twitter(twitcreds).stream('statuses/sample'
         , function(stream){
@@ -36,9 +37,12 @@ if (bUseTwitter){
                 io.sockets.emit('data', {len:tweet.text.length});
             })
     });
+
 } else {
+
     // TEST, make data:
     setInterval(function(){
         io.sockets.emit('data', {len:Math.floor((Math.random()*140)+1)});
     }, 2);
+
 }

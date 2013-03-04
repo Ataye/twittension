@@ -8,6 +8,7 @@ var appCtrl = function($scope, $compile){
     $scope.twitChange = [];     // changes prior to ui update
     $scope.panels = [];         // array of open panels.
     $scope.counter = 0;         // total number of tweets received.
+    $scope.visible = true;
 
 
     // update the tweets array:
@@ -84,91 +85,93 @@ var appCtrl = function($scope, $compile){
 
         // graph update (throttle to make sure we don't call it too often, reducing update performance):
         update = _.throttle(function () {
-            return function(){
-                // get and clean the data:
-                var dataLocal = bubble.nodes({children:$scope.twits})
-                    .filter(function (d) {
-                        return !d.children;
-                    });
+            // only update if window is visible:
+            if (!$scope.visible)
+            return;
 
-                // calculate colours:
-                var colour = d3.scale.linear().domain([
-                    _.min(dataLocal,function (dat) {
-                        return dat.value;
-                    }).value
-                    , _.max(dataLocal,function (dat) {
-                        return dat.value;
-                    }).value
-                ]).range(['#506c77', '#ffffff']);
+            // get and clean the data:
+            var dataLocal = bubble.nodes({children:$scope.twits})
+                .filter(function (d) {
+                    return !d.children;
+                });
 
-                // calc graph:
-                var node = svg.selectAll('.node')
-                    .data(dataLocal, function (d) {
-                        return d.name;
-                    });
+            // calculate colours:
+            var colour = d3.scale.linear().domain([
+                _.min(dataLocal,function (dat) {
+                    return dat.value;
+                }).value
+                , _.max(dataLocal,function (dat) {
+                    return dat.value;
+                }).value
+            ]).range(['#506c77', '#ffffff']);
 
-                // new nodes, add a group to contain the circle and label:
-                var g = node.enter().append('g')
-                    .attr('class', 'node');
+            // calc graph:
+            var node = svg.selectAll('.node')
+                .data(dataLocal, function (d) {
+                    return d.name;
+                });
 
-                // add a circle to the group:
-                g.append('circle')
-                    .style('fill', '#ffffff')
-                    .on('mouseover', function(d){ d3.select(this).attr('stroke', '#dbf5ff'); })
-                    .on('mouseout', function(d){ d3.select(this).attr('stroke', 'none'); })
-                    .on('click', fnItem_Click);
+            // new nodes, add a group to contain the circle and label:
+            var g = node.enter().append('g')
+                .attr('class', 'node');
 
-                // add the text label:
-                g.append('text')
-                    .attr("dy", ".3em")
-                    .attr('text-anchor', 'middle')
-                    .attr('pointer-events', 'none')
-                    .attr('pointer', 'none')
-                    .text(function (d) {
-                        return d.name;
-                    });
+            // add a circle to the group:
+            g.append('circle')
+                .style('fill', '#ffffff')
+                .on('mouseover', function(d){ d3.select(this).attr('stroke', '#dbf5ff'); })
+                .on('mouseout', function(d){ d3.select(this).attr('stroke', 'none'); })
+                .on('click', fnItem_Click);
 
-                // now position the new group:
-                g.attr('transform', function (d) {
+            // add the text label:
+            g.append('text')
+                .attr("dy", ".3em")
+                .attr('text-anchor', 'middle')
+                .attr('pointer-events', 'none')
+                .attr('pointer', 'none')
+                .text(function (d) {
+                    return d.name;
+                });
+
+            // now position the new group:
+            g.attr('transform', function (d) {
+                return "translate(" + d.x + ',' + d.y + ")";
+            });
+
+            // update all existing nodes (node doesn't yet contain new nodes):
+            node
+                .transition().duration(iUpdate*1.2)
+                .attr('transform', function (d) {
                     return "translate(" + d.x + ',' + d.y + ")";
                 });
 
-                // update all existing nodes (node doesn't yet contain new nodes):
-                node
-                    .transition().duration(iUpdate*1.2)
-                    .attr('transform', function (d) {
-                        return "translate(" + d.x + ',' + d.y + ")";
-                    });
+            // now select circles within each group and set the radius and style:
+            node.select('circle')
+                .transition().ease('elastic').duration(iUpdate*4)
+                .attr('r', function (d) { return d.r; })
+                .style('fill', function (d) { return colour(d.value); });
 
-                // now select circles within each group and set the radius and style:
-                node.select('circle')
-                    //.style('fill', '#fff')
-                    .transition().ease('elastic').duration(iUpdate*4)
-                    .attr('r', function (d) { return d.r; })
-                    .style('fill', function (d) { return colour(d.value); });
+            // select new nodes to highlight:
+            var nodesnew = d3.selectAll('circle')
+                .data(
+                bubble.nodes({
+                    children:$scope.twitChange})
+                        .filter(function (d) { return !d.children; })
+                , function (d) { return d.name; });
 
-                // select new nodes to highlight:
-                var nodesnew = d3.selectAll('circle')
-                    .data(
-                    bubble.nodes({
-                        children:$scope.twitChange})
-                            .filter(function (d) { return !d.children; })
-                    , function (d) { return d.name; });
+            nodesnew
+                .style('fill', '#ff7000')
+                .transition().duration(100)
+                .style('fill', '#fff')
+                .transition().ease('elastic').duration(iUpdate*4)
+                .style('fill', function (d) { return colour(d.value); });
 
-                nodesnew
-                    .style('fill', '#ff7000')
-                    .transition().duration(100)
-                    .style('fill', '#fff')
-                    .transition().ease('elastic').duration(iUpdate*4)
-                    .style('fill', function (d) { return colour(d.value); });
+            // clear new nodes:
+            $scope.twitChange = [];
 
-                // clear new nodes:
-                $scope.twitChange = [];
+            // return instance:
+            return this;
+        }, iUpdate);
 
-                // return instance:
-                return this;
-            }
-        }, iUpdate)();
 
         // return instance:
         return this;
@@ -181,6 +184,12 @@ var appCtrl = function($scope, $compile){
         fnUpdate(data.len);
     });
 
+    // setup the window focus watcher:
+    initFocusWatcher(function(Visible){
+        // update scope:
+        $scope.visible = Visible;
+        console.log($scope.visible);
+    });
 };
 
 // helpful methods:
@@ -195,4 +204,40 @@ var helpers = {
             , height: Math.max(db.scrollHeight, dde.scrollHeight, db.offsetHeight, dde.offsetHeight, db.clientHeight, dde.clientHeight) - 80
         };
     }
+};
+
+// detect when browser has focus (ref: http://stackoverflow.com/a/1060034):
+function initFocusWatcher(callback){
+    var hidden = "hidden";
+
+    // Standards:
+    if (hidden in document)
+        document.addEventListener("visibilitychange", onchange);
+    else if ((hidden = "mozHidden") in document)
+        document.addEventListener("mozvisibilitychange", onchange);
+    else if ((hidden = "webkitHidden") in document)
+        document.addEventListener("webkitvisibilitychange", onchange);
+    else if ((hidden = "msHidden") in document)
+        document.addEventListener("msvisibilitychange", onchange);
+
+    // IE 9 and lower:
+    else if ('onfocusin' in document)
+        document.onfocusin = document.onfocusout = onchange;
+
+    // All others:
+    else
+        window.onfocus = window.onblur = onchange;
+
+    function onchange (evt) {
+        var body = document.body;
+        evt = evt || window.event;
+
+        if (evt.type == "focus" || evt.type == "focusin")
+            callback(true);
+        else if (evt.type == "blur" || evt.type == "focusout")
+            callback(false);
+        else
+            callback(!this[hidden]);
+    }
 }
+
