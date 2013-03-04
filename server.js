@@ -26,8 +26,10 @@ io.sockets.on('connection', function(socket){
 
 // twitter:
 var bUseTwitter = process.env.NODE_ENV === 'production';
-console.log('Using Twitter Stream: ' + bUseTwitter);
 if (bUseTwitter){
+
+    // set io log level (so we don't fill the log with debug):
+    io.set('log level', 1);
 
     // get data from twitter:
     var tw = new twitter(twitcreds).stream('statuses/sample'
